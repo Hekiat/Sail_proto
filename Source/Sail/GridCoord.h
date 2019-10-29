@@ -9,6 +9,24 @@
 
 
 USTRUCT(BlueprintType)
+struct SAIL_API FSquareCoord
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 X;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Y;
+
+	FORCEINLINE FSquareCoord();
+
+	FORCEINLINE FSquareCoord(int32 InX, int32 InY);
+
+	FORCEINLINE FHexCoord toHex() const;
+};
+
+USTRUCT(BlueprintType)
 struct SAIL_API FHexCoord
 {
 	GENERATED_BODY()
@@ -25,6 +43,8 @@ struct SAIL_API FHexCoord
 	FORCEINLINE FHexCoord();
 
 	FORCEINLINE FHexCoord(int32 InX, int32 InY, int32 InZ);
+
+	FORCEINLINE FSquareCoord toSquare() const;
 };
 
 USTRUCT(BlueprintType)
@@ -33,25 +53,31 @@ struct SAIL_API FGridCoord
 	GENERATED_BODY()
 
 	// Classic coord system
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 X;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSquareCoord SquareCoord;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Y;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FHexCoord HexCoord;
 
 	FORCEINLINE FGridCoord();
 
-	FORCEINLINE FGridCoord(int32 InX, int32 InY);
+	FORCEINLINE FGridCoord(const FSquareCoord& sc);
+	FORCEINLINE FGridCoord(const FHexCoord& hc);
 
-	FORCEINLINE FGridCoord(const FHexCoord& hexCoord);
+	FORCEINLINE FGridCoord(const int32 _X, const int32 _Y);
+	FORCEINLINE FGridCoord(const int32 _X, const int32 _Y, const int32 _Z);
 
 	FORCEINLINE FGridCoord operator+(const FGridCoord& V) const;
 
 	FORCEINLINE FGridCoord operator-(const FGridCoord& V) const;
 
+	FORCEINLINE void setSquareCoord(const FSquareCoord& sc);
+
+	FORCEINLINE void setHexCoord(const FHexCoord& hc);
+	
 	float length()
 	{
-		return FMath::Abs(X) + FMath::Abs(Y);
+		return FMath::Abs(SquareCoord.X) + FMath::Abs(SquareCoord.Y);
 	}
 
 	float distance(const FGridCoord& o)
@@ -59,7 +85,9 @@ struct SAIL_API FGridCoord
 		return (*this - o).length();
 	}
 
-	FHexCoord toHex() const;
+private:
+	void updateSquare();
+	void updateHex();
 
 	//float hexDistance(const FGridCoord& o)
 	//{
@@ -94,8 +122,38 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "To HexCoord", CompactNodeTitle = "HexCoord", Keywords = "hex coord"), Category = "Math|GridCoord")
-	static FHexCoord ToHex(FGridCoord a)
+	static FHexCoord ToHex(FSquareCoord sc)
 	{
-		return a.toHex();
+		return sc.toHex();
+	}
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "To SquareCoord", CompactNodeTitle = "SquareCoord", Keywords = "square coord"), Category = "Math|GridCoord")
+		static FSquareCoord ToSquare(FHexCoord hc)
+	{
+		return hc.toSquare();
+	}
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Make GridCoord From Square", CompactNodeTitle = "GridCoord", Keywords = "make grid coord"), Category = "Math|GridCoord")
+	static void MakeGridCoordFromSquare(FGridCoord& own, const FSquareCoord& sc)
+	{
+		own.setSquareCoord(sc);
+	}
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Set Square Coord", CompactNodeTitle = "Set Square", Keywords = "set square coord"), Category = "Math|GridCoord")
+	static FGridCoord setSquareCoord(FGridCoord gc, const FSquareCoord& sc)
+	{
+		return FGridCoord(sc);
+	}
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Make GridCoord From Hex", CompactNodeTitle = "GridCoord", Keywords = "make grid coord"), Category = "Math|GridCoord")
+	static void MakeGridCoordFromHex(FGridCoord& own, const FHexCoord& hc)
+	{
+		own.setHexCoord(hc);
+	}
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Set Hex Coord", CompactNodeTitle = "Set Hex", Keywords = "set hex coord"), Category = "Math|GridCoord")
+		static FGridCoord setHexCoord(FGridCoord gc, const FHexCoord& hc)
+	{
+		return FGridCoord(hc);
 	}
 };

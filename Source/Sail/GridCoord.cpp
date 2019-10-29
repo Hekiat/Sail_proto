@@ -3,45 +3,97 @@
 
 #include "GridCoord.h"
 
-
-FORCEINLINE FHexCoord::FHexCoord()
-{}
-
-
-FORCEINLINE FHexCoord::FHexCoord(int32 InHexX, int32 InHexY, int32 InHexZ)
-	: X(InHexX), Y(InHexY), Z(InHexZ)
-{
-}
-
-
-
-FORCEINLINE FGridCoord::FGridCoord()
-{}
-
-FORCEINLINE FGridCoord::FGridCoord(const FHexCoord& hexCoord)
+FORCEINLINE FSquareCoord::FSquareCoord()
 {
 
 }
 
-FORCEINLINE FGridCoord::FGridCoord(int32 InX, int32 InY)
-	: X(InX), Y(InY)
+FORCEINLINE FSquareCoord::FSquareCoord(int32 _X, int32 _Y)
+	: X(_X), Y(_Y)
 {
+
 }
 
-FORCEINLINE FGridCoord FGridCoord::operator+(const FGridCoord& o) const
-{
-	return FGridCoord(X + o.X, Y + o.Y);
-}
-
-FORCEINLINE FGridCoord FGridCoord::operator-(const FGridCoord& o) const
-{
-	return FGridCoord(X - o.X, Y - o.Y);
-}
-
-FHexCoord FGridCoord::toHex() const
+FHexCoord FSquareCoord::toHex() const
 {
 	auto x = X;
 	auto z = Y - (X - (X % 2)) / 2;
 	auto y = -x - z;
 	return FHexCoord(x, y, z);
+}
+
+
+FORCEINLINE FHexCoord::FHexCoord()
+{}
+
+
+FORCEINLINE FHexCoord::FHexCoord(int32 _HexX, int32 _HexY, int32 _HexZ)
+	: X(_HexX), Y(_HexY), Z(_HexZ)
+{
+}
+
+FORCEINLINE FSquareCoord FHexCoord::toSquare() const
+{
+	return FSquareCoord(-1, -1);
+}
+
+
+FORCEINLINE FGridCoord::FGridCoord()
+{}
+
+FORCEINLINE FGridCoord::FGridCoord(const FHexCoord& hc)
+{
+	HexCoord = hc;
+	updateSquare();
+}
+
+FORCEINLINE FGridCoord::FGridCoord(const FSquareCoord& sc)
+{
+	SquareCoord = sc;
+	updateHex();
+}
+
+FORCEINLINE FGridCoord::FGridCoord(const int32 _X, const int32 _Y)
+	: SquareCoord(_X, _Y)
+{
+	updateHex();
+}
+
+FORCEINLINE FGridCoord::FGridCoord(const int32 _X, const int32 _Y, const int32 _Z)
+	: HexCoord(_X, _Y, _Z)
+{
+
+}
+
+FORCEINLINE FGridCoord FGridCoord::operator+(const FGridCoord& o) const
+{
+	return FGridCoord(SquareCoord.X + o.SquareCoord.X, SquareCoord.Y + o.SquareCoord.Y);
+}
+
+FORCEINLINE FGridCoord FGridCoord::operator-(const FGridCoord& o) const
+{
+	return FGridCoord(SquareCoord.X - o.SquareCoord.X, SquareCoord.Y - o.SquareCoord.Y);
+}
+
+FORCEINLINE void FGridCoord::setSquareCoord(const FSquareCoord& sc)
+{
+	SquareCoord = sc;
+
+	updateHex();
+}
+
+FORCEINLINE void FGridCoord::setHexCoord(const FHexCoord& hc)
+{
+	HexCoord = hc;
+	updateSquare();
+}
+
+void FGridCoord::updateSquare()
+{
+	SquareCoord = HexCoord.toSquare();
+}
+
+void FGridCoord::updateHex()
+{
+	HexCoord = SquareCoord.toHex();
 }
