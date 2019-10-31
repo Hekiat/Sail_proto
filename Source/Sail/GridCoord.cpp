@@ -22,6 +22,10 @@ FHexCoord FSquareCoord::toHex() const
 	return FHexCoord(x, y, z);
 }
 
+FORCEINLINE FString FSquareCoord::ToString() const
+{
+	return FString::Printf(TEXT("(%d, %d)"), X, Y);
+}
 
 FORCEINLINE FHexCoord::FHexCoord()
 {}
@@ -30,6 +34,11 @@ FORCEINLINE FHexCoord::FHexCoord()
 FORCEINLINE FHexCoord::FHexCoord(int32 _HexX, int32 _HexY, int32 _HexZ)
 	: X(_HexX), Y(_HexY), Z(_HexZ)
 {
+}
+
+FORCEINLINE FString FHexCoord::ToString() const
+{
+	return FString::Printf(TEXT("(%d, %d, %d)"), X, Y, Z);
 }
 
 FORCEINLINE FSquareCoord FHexCoord::toSquare() const
@@ -87,6 +96,12 @@ FORCEINLINE void FGridCoord::setHexCoord(const FHexCoord& hc)
 	HexCoord = hc;
 	updateSquare();
 }
+
+FORCEINLINE FString FGridCoord::ToString() const
+{
+	return "[" + SquareCoord.ToString() + ", " + HexCoord.ToString() + "]";
+}
+
 
 void FGridCoord::updateSquare()
 {
