@@ -48,7 +48,8 @@ FORCEINLINE FSquareCoord FHexCoord::toSquare() const
 
 
 FORCEINLINE FGridCoord::FGridCoord()
-{}
+{
+}
 
 FORCEINLINE FGridCoord::FGridCoord(const FHexCoord& hc)
 {
@@ -71,7 +72,7 @@ FORCEINLINE FGridCoord::FGridCoord(const int32 _X, const int32 _Y)
 FORCEINLINE FGridCoord::FGridCoord(const int32 _X, const int32 _Y, const int32 _Z)
 	: HexCoord(_X, _Y, _Z)
 {
-
+	// update square
 }
 
 FORCEINLINE FGridCoord FGridCoord::operator+(const FGridCoord& o) const
@@ -82,6 +83,11 @@ FORCEINLINE FGridCoord FGridCoord::operator+(const FGridCoord& o) const
 FORCEINLINE FGridCoord FGridCoord::operator-(const FGridCoord& o) const
 {
 	return FGridCoord(SquareCoord.X - o.SquareCoord.X, SquareCoord.Y - o.SquareCoord.Y);
+}
+
+FORCEINLINE bool FGridCoord::operator==(const FGridCoord& o) const
+{
+	return SquareCoord.X == o.SquareCoord.X && SquareCoord.Y == o.SquareCoord.Y;
 }
 
 FORCEINLINE void FGridCoord::setSquareCoord(const FSquareCoord& sc)

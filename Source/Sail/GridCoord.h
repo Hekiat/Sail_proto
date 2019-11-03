@@ -71,9 +71,11 @@ struct SAIL_API FGridCoord
 	FORCEINLINE FGridCoord(const int32 _X, const int32 _Y);
 	FORCEINLINE FGridCoord(const int32 _X, const int32 _Y, const int32 _Z);
 
-	FORCEINLINE FGridCoord operator+(const FGridCoord& V) const;
+	FORCEINLINE FGridCoord operator+(const FGridCoord& o) const;
 
-	FORCEINLINE FGridCoord operator-(const FGridCoord& V) const;
+	FORCEINLINE FGridCoord operator-(const FGridCoord& o) const;
+
+	FORCEINLINE bool operator==(const FGridCoord& o) const;
 
 	FORCEINLINE void setSquareCoord(const FSquareCoord& sc);
 
@@ -91,10 +93,14 @@ struct SAIL_API FGridCoord
 		return (*this - o).length();
 	}
 
+	float hexDistance(const FGridCoord& o)
+	{
+		return (abs(HexCoord.X - o.HexCoord.X) + abs(HexCoord.Y - o.HexCoord.Y) + abs(HexCoord.Z - o.HexCoord.Z)) / 2;
+	}
+
 private:
 	void updateSquare();
 	void updateHex();
-
 	//float hexDistance(const FGridCoord& o)
 	//{
 	//	return (*this - o).length();
@@ -102,6 +108,14 @@ private:
 
 	//FORCEINLINE FGridCoord operator-(const FGridCoord& V) const;
 };
+
+FORCEINLINE uint32 GetTypeHash(const FGridCoord& gc)
+{
+	uint32 hash = gc.SquareCoord.X * 1000; // X Offset
+	hash += gc.SquareCoord.Y; // Y Offset
+
+	return hash;
+}
 
 
 UCLASS()
@@ -174,6 +188,12 @@ public:
 	static float Distance(FGridCoord a, FGridCoord b)
 	{
 		return a.distance(b);
+	}
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "HexDistance GridCoord GridCoord", CompactNodeTitle = "HexDist", Keywords = "distance", CommutativeAssociativeBinaryOperator = "true"), Category = "Math|GridCoord")
+	static float HexDistance(FGridCoord a, FGridCoord b)
+	{
+		return a.hexDistance(b);
 	}
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToString (GridCoord)", CompactNodeTitle = "->", BlueprintAutocast), Category = "Math|GridCoord")
