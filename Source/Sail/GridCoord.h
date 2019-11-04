@@ -83,17 +83,17 @@ struct SAIL_API FGridCoord
 	
 	FORCEINLINE FString ToString() const;
 
-	float length()
+	int32 length()
 	{
 		return FMath::Abs(SquareCoord.X) + FMath::Abs(SquareCoord.Y);
 	}
 
-	float distance(const FGridCoord& o)
+	int32 distance(const FGridCoord& o)
 	{
 		return (*this - o).length();
 	}
 
-	float hexDistance(const FGridCoord& o)
+	int32 hexDistance(const FGridCoord& o)
 	{
 		return (abs(HexCoord.X - o.HexCoord.X) + abs(HexCoord.Y - o.HexCoord.Y) + abs(HexCoord.Z - o.HexCoord.Z)) / 2;
 	}
@@ -185,13 +185,13 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Distance GridCoord GridCoord", CompactNodeTitle = "Dist", Keywords = "distance", CommutativeAssociativeBinaryOperator = "true"), Category = "Math|GridCoord")
-	static float Distance(FGridCoord a, FGridCoord b)
+	static int32 Distance(FGridCoord a, FGridCoord b)
 	{
 		return a.distance(b);
 	}
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "HexDistance GridCoord GridCoord", CompactNodeTitle = "HexDist", Keywords = "distance", CommutativeAssociativeBinaryOperator = "true"), Category = "Math|GridCoord")
-	static float HexDistance(FGridCoord a, FGridCoord b)
+	static int32 HexDistance(FGridCoord a, FGridCoord b)
 	{
 		return a.hexDistance(b);
 	}
@@ -221,7 +221,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Set Hex Coord", CompactNodeTitle = "Set Hex", Keywords = "set hex coord"), Category = "Math|GridCoord")
-		static FGridCoord setHexCoord(FGridCoord gc, const FHexCoord& hc)
+	static FGridCoord setHexCoord(FGridCoord gc, const FHexCoord& hc)
 	{
 		return FGridCoord(hc);
 	}
